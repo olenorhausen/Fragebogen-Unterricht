@@ -174,7 +174,7 @@
 
 <header>
   <div class="wrap">
-    <h1>Fragebogen: Unterrichtsgestaltung und Leistungsnachweise</h1>
+    <h1>FSP2 · Fragebogen: Unterrichtsgestaltung und Leistungsnachweise</h1>
     <p>Erzieher:innenausbildung FSP · anonyme Befragung im Kolleg:innenkreis · ca. 10&nbsp;Minuten</p>
   </div>
 </header>
@@ -252,6 +252,27 @@
     </section>
 
   </form>
+
+  <div class="block" id="thankYouBlock" style="display:none; text-align:center;">
+    <h2 style="font-size:1.4rem; margin-bottom:.6rem;">Vielen Dank!</h2>
+    <p style="font-size:1.05rem; color:var(--ink); max-width:520px; margin:0 auto;">
+      Deine Angaben wurden übermittelt und fließen anonym in die Auswertung für den Beitrag ein.
+      Ich weiß den Aufwand sehr zu schätzen — ohne eure Antworten gäbe es keine Datengrundlage für die
+      Fallanalyse. Danke, dass du dir die Zeit genommen hast!
+    </p>
+  </div>
+
+  <div class="block" id="prizeBlock" style="display:none;">
+    <h2>Buchpreis-Verlosung (freiwillig)</h2>
+    <p class="hint">
+      Wenn du an der Verlosung teilnehmen möchtest, trag hier deinen Namen ein. Er wird getrennt von deinen
+      Fragebogen-Antworten gespeichert (eigene Liste, ohne Verknüpfung) — eine Zuordnung zu deinen Antworten
+      ist damit nicht möglich.
+    </p>
+    <input type="text" id="prizeName" placeholder="Dein Name">
+    <button type="button" id="prizeSubmitBtn" style="margin-top:.8rem; width:100%; background:var(--accent); color:#fff; border:none; padding:.75rem; font-size:.95rem; font-weight:600; border-radius:8px; cursor:pointer;">Am Gewinnspiel teilnehmen</button>
+    <div class="status" id="prizeStatus"></div>
+  </div>
 </div>
 
 <script>
@@ -448,7 +469,10 @@ form.addEventListener("submit", async function (e) {
       body: JSON.stringify(data)
     });
     statusBox.className = "status ok";
-    statusBox.textContent = "Danke, deine Angaben wurden übermittelt.";
+    statusBox.textContent = "Übermittelt.";
+    document.getElementById("surveyForm").style.display = "none";
+    document.getElementById("thankYouBlock").style.display = "block";
+    document.getElementById("prizeBlock").style.display = "block";
     form.reset();
   } catch (err) {
     statusBox.className = "status err";
@@ -456,6 +480,40 @@ form.addEventListener("submit", async function (e) {
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = "Fragebogen absenden";
+  }
+});
+
+// Gewinnspiel — bewusst getrennter POST ohne jeden Bezug zu den Fragebogen-Antworten
+const prizeSubmitBtn = document.getElementById("prizeSubmitBtn");
+const prizeStatus = document.getElementById("prizeStatus");
+prizeSubmitBtn.addEventListener("click", async function () {
+  const name = document.getElementById("prizeName").value.trim();
+  prizeStatus.className = "status";
+  prizeStatus.textContent = "";
+  if (!name) {
+    prizeStatus.className = "status err";
+    prizeStatus.textContent = "Bitte einen Namen eintragen.";
+    return;
+  }
+  prizeSubmitBtn.disabled = true;
+  prizeSubmitBtn.textContent = "Wird gesendet …";
+  try {
+    if (GOOGLE_SCRIPT_URL.startsWith("PASTE_")) throw new Error("no-endpoint");
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ formType: "gewinnspiel", name: name, timestamp: new Date().toISOString() })
+    });
+    prizeStatus.className = "status ok";
+    prizeStatus.textContent = "Danke, du nimmst an der Verlosung teil.";
+    prizeSubmitBtn.style.display = "none";
+    document.getElementById("prizeName").disabled = true;
+  } catch (err) {
+    prizeStatus.className = "status err";
+    prizeStatus.textContent = "Übermittlung fehlgeschlagen. Bitte kurz erneut versuchen.";
+    prizeSubmitBtn.disabled = false;
+    prizeSubmitBtn.textContent = "Am Gewinnspiel teilnehmen";
   }
 });
 </script>
