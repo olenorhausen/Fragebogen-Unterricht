@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fragebogen: Unterrichtsgestaltung und Leistungsnachweise</title>
+<!-- Version 3: praxisnahe Formulierungen, eigener Baustein Haltung/Theorie-Praxis-Bezug, Abschnittserklärungen -->
+<style>
+  :root {
+    --ink: #1f2323;
+    --muted: #5c6462;
+    --line: #d8ddd9;
+    --accent: #3c6e5a;
+    --accent-bg: #eef3f0;
+    --bg: #fbfaf7;
+    --card: #ffffff;
+    --danger: #a33;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    margin: 0;
+    padding: 0 0 4rem;
+    line-height: 1.55;
+  }
+  header {
+    background: var(--accent);
+    color: #fff;
+    padding: 2.2rem 1.5rem 1.6rem;
+  }
+  header .wrap { max-width: 760px; margin: 0 auto; }
+  header h1 { margin: 0 0 .4rem; font-size: 1.5rem; font-weight: 600; }
+  header p { margin: 0; opacity: .92; font-size: .95rem; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 1.5rem; }
+  .intro {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: -1.4rem;
+    font-size: .95rem;
+    color: var(--muted);
+  }
+  .intro strong { color: var(--ink); }
+  section.block {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.4rem 1.5rem;
+    margin-top: 1.4rem;
+  }
+  section.block h2 {
+    font-size: 1.05rem;
+    margin: 0 0 .3rem;
+    color: var(--accent);
+  }
+  section.block > p.hint {
+    margin: 0 0 .6rem;
+    color: var(--muted);
+    font-size: .9rem;
+  }
+  section.block > p.explain {
+    margin: 0 0 1.2rem;
+    color: var(--ink);
+    font-size: .88rem;
+    background: var(--accent-bg);
+    border-radius: 8px;
+    padding: .7rem .9rem;
+  }
+  .item {
+    padding: 1rem 0;
+    border-top: 1px solid var(--line);
+  }
+  .item:first-of-type { border-top: none; padding-top: .3rem; }
+  .item label.qtext {
+    display: block;
+    font-weight: 500;
+    margin-bottom: .7rem;
+    font-size: .96rem;
+  }
+  .qnum {
+    color: var(--accent);
+    font-weight: 600;
+    margin-right: .3rem;
+  }
+  .scale {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .scale-opt {
+    flex: 1;
+    min-width: 90px;
+    text-align: center;
+  }
+  .scale-opt input { display: none; }
+  .scale-opt span {
+    display: block;
+    padding: .55rem .4rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: .78rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .scale-opt input:checked + span {
+    background: var(--accent-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  textarea, input[type=text], select {
+    width: 100%;
+    font-family: inherit;
+    font-size: .95rem;
+    padding: .6rem .7rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    resize: vertical;
+    color: var(--ink);
+    background: #fff;
+  }
+  textarea { min-height: 90px; }
+  .meta-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 560px) { .meta-row { grid-template-columns: 1fr; } }
+  .meta-row .field label {
+    display: block;
+    font-size: .85rem;
+    color: var(--muted);
+    margin-bottom: .35rem;
+  }
+  .consent {
+    display: flex;
+    gap: .6rem;
+    align-items: flex-start;
+    font-size: .88rem;
+    color: var(--muted);
+  }
+  .consent input { margin-top: .25rem; }
+  button#submitBtn {
+    width: 100%;
+    margin-top: 1.6rem;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: .9rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button#submitBtn:disabled { opacity: .55; cursor: not-allowed; }
+  .error {
+    color: var(--danger);
+    font-size: .82rem;
+    margin-top: .4rem;
+    display: none;
+  }
+  .status {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: .92rem;
+    display: none;
+  }
+  .status.ok { background: var(--accent-bg); color: var(--accent); display: block; }
+  .status.err { background: #fbeaea; color: var(--danger); display: block; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Fragebogen: Unterrichtsgestaltung und Leistungsnachweise</h1>
+    <p>Erzieher:innenausbildung FSP · anonyme Befragung im Kolleg:innenkreis · ca. 10&nbsp;Minuten</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="intro">
+    Dieser Fragebogen erhebt Daten zu einer <strong>illustrativen Fallanalyse</strong> im Rahmen eines Beitrags zur
+    sozialdidaktischen Unterrichtspraxis. Es geht darum, wie Praxisbezug, Fachwissen, Theorie, eigene Erfahrungen
+    und Haltung in deinem Unterricht und in Leistungsnachweisen vorkommen — oder eben nicht. Deine Angaben werden
+    <strong>anonym</strong> erfasst und ausschließlich für diese Auswertung verwendet. Antworte bitte so, wie es
+    tatsächlich in deinem Unterricht abläuft — nicht, wie es idealerweise ablaufen sollte.
+  </div>
+
+  <form id="surveyForm">
+
+    <section class="block">
+      <h2>Kontext</h2>
+      <p class="hint">Kurze Einordnung — keine Namen, keine Klassenangaben.</p>
+      <div class="meta-row">
+        <div class="field">
+          <label for="lernfeld">Unterrichtete(s) Lernfeld(er) / Fach</label>
+          <input type="text" id="lernfeld" name="lernfeld" placeholder="z. B. Lernfeld 4, 12">
+        </div>
+        <div class="field">
+          <label for="erfahrung">Berufserfahrung als Lehrkraft</label>
+          <select id="erfahrung" name="erfahrung">
+            <option value="">bitte wählen</option>
+            <option value="0-2 Jahre">0–2 Jahre</option>
+            <option value="3-5 Jahre">3–5 Jahre</option>
+            <option value="6-10 Jahre">6–10 Jahre</option>
+            <option value="über 10 Jahre">über 10 Jahre</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>A · Unterrichtsgestaltung: Unterricht im Vergleich zum Leistungsnachweis</h2>
+      <p class="hint">Es geht um folgende sieben Aspekte: Praxisbeispiele der Auszubildenden, konkrete Handlungsschritte, theoretische Hintergründe, eigene Erfahrungen, offene Fragen, die Verbindung mehrerer Aspekte und regelmäßige Reflexion. Zu jedem gibt es zwei Fragen — einmal bezogen auf den <strong>Unterricht</strong>, einmal auf den <strong>Leistungsnachweis</strong>.</p>
+      <div id="items-a"></div>
+    </section>
+
+    <section class="block">
+      <h2>B · Haltung und Vorbildwirkung</h2>
+      <p class="hint">Mit „Haltung" ist die pädagogische Grundeinstellung gemeint, die Auszubildende später im Job zeigen sollen — Wertschätzung, Kindorientierung, Beziehungsfähigkeit. Der „doppelte Theorie-Praxis-Bezug" meint: Wie du selbst im Unterricht mit den Auszubildenden umgehst, ist gleichzeitig ein Modell dafür, wie sie später mit Kindern oder Klient:innen umgehen sollen.</p>
+      <div id="items-haltung"></div>
+    </section>
+
+    <section class="block">
+      <h2>C · Leistungsnachweise — ergänzende Fragen</h2>
+      <div id="items-b"></div>
+    </section>
+
+    <section class="block">
+      <h2>D · Allgemeine Einschätzungen</h2>
+      <p class="hint">Ein paar allgemeine Fragen.</p>
+      <div id="items-c"></div>
+    </section>
+
+    <section class="block">
+      <h2>E · Offene Fragen</h2>
+      <p class="hint">Freitext — gerne mit konkreten Beispielen aus deiner Praxis.</p>
+      <div id="items-d"></div>
+    </section>
+
+    <section class="block">
+      <label class="consent">
+        <input type="checkbox" id="consent" name="consent">
+        <span>Ich bin damit einverstanden, dass meine anonymen Angaben für die oben beschriebene Auswertung verwendet werden.</span>
+      </label>
+      <div class="error" id="consentError">Bitte Einverständnis bestätigen, um fortzufahren.</div>
+
+      <button type="submit" id="submitBtn">Fragebogen absenden</button>
+      <div class="status" id="statusBox"></div>
+    </section>
+
+  </form>
+</div>
+
+<script>
+// ---- WICHTIG: Vor dem ersten Einsatz die Apps-Script-Web-App-URL eintragen ----
+// (siehe mitgeliefertes Apps-Script-Snippet für ein neues Google Sheet)
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycUzw4BmI0rVX_G39rdTkXRm67qJsVPd03ZCegJixMEAdwPvNE2B7j4BYCpbWgLGqp/exec";
+
+const scaleLabels = [
+  "trifft gar nicht zu",
+  "trifft eher nicht zu",
+  "teils/teils",
+  "trifft eher zu",
+  "trifft voll zu"
+];
+
+// Abschnitt A — Matrix: dieselbe Sache je einmal für "Unterricht" und einmal für "Prüfung" abgefragt.
+// Die Lücke zwischen beiden Werten pro Dimension ist die Operationalisierung von "Verschwinden".
+const dimensionsA = [
+  {
+    key: "praxis",
+    label: "Praxisbeispiele der Auszubildenden",
+    teach: "Praxisbeispiele der Auszubildenden (z. B. aus dem Kita- oder Einrichtungsalltag) kommen in meinem normalen Unterricht häufig vor.",
+    exam: "Praxisbeispiele der Auszubildenden spielen bei dem, was am Ende tatsächlich benotet wird, eine Rolle."
+  },
+  {
+    key: "handlung",
+    label: "Konkrete Handlungsschritte für die Praxis",
+    teach: "Ich zeige im Unterricht konkrete Handlungsschritte, die direkt in der Praxis anwendbar sind.",
+    exam: "Konkrete Handlungsschritte für die Praxis werden bei mir tatsächlich benotet."
+  },
+  {
+    key: "theorie",
+    label: "Theoretische Hintergründe",
+    teach: "Ich mache im Unterricht deutlich, welche Theorie (z. B. Entwicklungspsychologie, Soziologie) hinter einem pädagogischen Thema steckt.",
+    exam: "Das Verständnis theoretischer Hintergründe wird bei mir tatsächlich benotet."
+  },
+  {
+    key: "erfahrung",
+    label: "Eigene, auch widersprüchliche Erfahrungen",
+    teach: "Ich gebe im Unterricht Raum, über eigene Erlebnisse zu sprechen, auch wenn diese nicht eindeutig oder unangenehm sind.",
+    exam: "Eigene, auch widersprüchliche Erfahrungen der Auszubildenden fließen bei mir in die Benotung ein."
+  },
+  {
+    key: "ambiguitaet",
+    label: "Offene Fragen, die nicht sofort aufgelöst werden",
+    teach: "Ich lasse im Unterricht Widersprüche und offene Fragen auch mal stehen, statt sie schnell aufzulösen.",
+    exam: "Auch bei Leistungsnachweisen ist Raum dafür, dass eine Frage mehrere vertretbare Antworten hat."
+  },
+  {
+    key: "verbindung",
+    label: "Verbindung mehrerer Aspekte in einer Einheit",
+    teach: "Ich verbinde in einer Unterrichtseinheit oft mehrere Dinge gleichzeitig — Praxisbeispiel, Theorie, eigene Erfahrung —, statt sie getrennt zu behandeln.",
+    exam: "Auch bei Leistungsnachweisen müssen die Auszubildenden mehrere dieser Aspekte gleichzeitig zeigen, nicht nur einen."
+  },
+  {
+    key: "reflexion",
+    label: "Regelmäßige Reflexion",
+    teach: "Reflexion ist bei mir fest eingeplanter Bestandteil des Unterrichts, nicht nur gelegentlich.",
+    exam: "Reflexionsfähigkeit wird bei mir tatsächlich benotet."
+  }
+];
+
+const itemsA = [];
+dimensionsA.forEach(d => {
+  itemsA.push({ id: "a_" + d.key + "_u", text: d.teach, groupLabel: d.label, groupPos: "u" });
+  itemsA.push({ id: "a_" + d.key + "_p", text: d.exam, groupPos: "p" });
+});
+itemsA.push({ id: "a_control", text: "Ich schaffe es in jeder einzelnen Unterrichtsstunde, ausnahmslos alle sieben Aspekte vollständig einzubauen.", control: true });
+itemsA.push({ id: "a_zeitdruck", text: "Zeitdruck schränkt ein, wie viel Raum ich für Reflexion und Erfahrungsaustausch geben kann." });
+itemsA.push({ id: "a_bewertungsdruck", text: "Bewertungsdruck beeinflusst, welche Inhalte ich in den Vordergrund stelle." });
+
+// Neuer Baustein B — Haltung und doppelter Theorie-Praxis-Bezug
+const itemsHaltung = [
+  { id: "h1", text: "Ich spreche im Unterricht explizit darüber, was eine gute pädagogische Haltung ausmacht — nicht nur über Fachwissen." },
+  { id: "h2", text: "Ich gebe den Auszubildenden Rückmeldung zu ihrer Haltung, auch wenn das nicht benotet wird." },
+  { id: "h3", text: "Mir ist bewusst, dass die Art, wie ich die Auszubildenden im Unterricht behandle, selbst ein Vorbild dafür ist, wie sie später mit Kindern oder Klient:innen umgehen sollen." },
+  { id: "h4", text: "Ich mache den Auszubildenden diesen Zusammenhang — unser Umgang miteinander als Modell für ihren späteren pädagogischen Umgang — aktiv zum Thema." },
+  { id: "h5", text: "Für Haltung und Vorbildwirkung bleibt im normalen Unterrichtsalltag eher wenig Raum." }
+];
+
+// Abschnitt C — ergänzende Fragen zu Prüfungsformaten (b3 = Overclaiming-Kontrollitem)
+// Überlappende Einzelfragen wurden entfernt — das misst jetzt die Matrix in Abschnitt A.
+const itemsB = [
+  { id: "b1", text: "Insgesamt habe ich den Eindruck, dass bei Leistungsnachweisen andere Dinge zählen als im täglichen Unterricht." },
+  { id: "b2", text: "Ich nutze unbenotete Formate (z. B. Portfolios, Lerntagebücher, mündliches Feedback), um Dinge sichtbar zu machen, die sich schwer benoten lassen." },
+  { id: "b3", text: "Bei mir gab es noch nie einen Leistungsnachweis, der ausschließlich Fachwissen abfragt.", control: true },
+  { id: "b4", text: "Ich erlebe einen Konflikt zwischen dem, was mir im Unterricht wichtig ist (Haltung, Ambiguität), und dem, was die Prüfungsordnung verlangt." }
+];
+
+// Abschnitt D — allgemeines, themenfremdes Kontrollset zu sozialer Erwünschtheit
+// (selbst konstruiert, keine validierte Skala)
+const itemsC = [
+  { id: "c1", text: "Ich habe manchmal Aufgaben aufgeschoben, die ich eigentlich hätte erledigen sollen.", control: true, reverseHint: true },
+  { id: "c2", text: "Es fällt mir leicht, einen Fehler einzugestehen, auch wenn ihn niemand bemerkt hätte.", control: true },
+  { id: "c3", text: "Ich war schon einmal genervt von Kolleg:innen, auch wenn ich es ihnen nicht gezeigt habe.", control: true, reverseHint: true },
+  { id: "c4", text: "Ich habe noch nie etwas getan, das ich im Nachhinein bereue.", control: true }
+];
+
+const openQuestions = [
+  "Welche Aspekte pädagogischer Professionalität lassen sich deiner Erfahrung nach bei Leistungsnachweisen kaum abbilden — und warum?",
+  "Kannst du ein konkretes Beispiel beschreiben, in dem Zeit- oder Bewertungsdruck dazu geführt hat, dass du Reflexion, Erfahrungsaustausch oder Ähnliches gekürzt oder verschoben hast?",
+  "Wo im Ablauf einer Unterrichtseinheit (Wahrnehmen/Beobachten, Analyse/Verstehen, Planung, Durchführung, Reflexion) spürst du die größte Spannung zwischen dem, was dir wichtig ist, und dem, was geprüft wird?",
+  "Welche — auch unbenoteten — Formate haben sich in deiner Praxis bewährt, um Haltung oder Erfahrungswissen sichtbar zu machen?",
+  "Sonstige Anmerkungen"
+];
+
+let qCounter = 0;
+
+function renderScaleItem(item) {
+  qCounter++;
+  const wrap = document.createElement("div");
+  wrap.className = "item";
+  const label = document.createElement("label");
+  label.className = "qtext";
+  label.innerHTML = '<span class="qnum">' + qCounter + '.</span> ' + item.text;
+  wrap.appendChild(label);
+
+  const scale = document.createElement("div");
+  scale.className = "scale";
+  scaleLabels.forEach((lbl, i) => {
+    const optWrap = document.createElement("label");
+    optWrap.className = "scale-opt";
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = item.id;
+    input.value = i + 1;
+    input.required = true;
+    const span = document.createElement("span");
+    span.textContent = (i + 1) + " – " + lbl;
+    optWrap.appendChild(input);
+    optWrap.appendChild(span);
+    scale.appendChild(optWrap);
+  });
+  wrap.appendChild(scale);
+  return wrap;
+}
+
+function renderOpenItem(id, text) {
+  qCounter++;
+  const wrap = document.createElement("div");
+  wrap.className = "item";
+  const label = document.createElement("label");
+  label.className = "qtext";
+  label.setAttribute("for", id);
+  label.innerHTML = '<span class="qnum">' + qCounter + '.</span> ' + text;
+  const textarea = document.createElement("textarea");
+  textarea.id = id;
+  textarea.name = id;
+  wrap.appendChild(label);
+  wrap.appendChild(textarea);
+  return wrap;
+}
+
+document.getElementById("items-a").append(...itemsA.map(renderScaleItem));
+document.getElementById("items-haltung").append(...itemsHaltung.map(renderScaleItem));
+document.getElementById("items-b").append(...itemsB.map(renderScaleItem));
+document.getElementById("items-c").append(...itemsC.map(renderScaleItem));
+document.getElementById("items-d").append(...openQuestions.map((text, i) => renderOpenItem("d" + (i + 1), text)));
+
+const form = document.getElementById("surveyForm");
+const submitBtn = document.getElementById("submitBtn");
+const statusBox = document.getElementById("statusBox");
+const consentError = document.getElementById("consentError");
+
+form.addEventListener("submit", async function (e) {
+  e.preventDefault();
+  statusBox.className = "status";
+  statusBox.textContent = "";
+  consentError.style.display = "none";
+
+  if (!document.getElementById("consent").checked) {
+    consentError.style.display = "block";
+    return;
+  }
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+
+  const data = { timestamp: new Date().toISOString() };
+  new FormData(form).forEach((value, key) => { data[key] = value; });
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Wird gesendet …";
+
+  try {
+    if (GOOGLE_SCRIPT_URL.startsWith("PASTE_")) {
+      throw new Error("no-endpoint");
+    }
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(data)
+    });
+    statusBox.className = "status ok";
+    statusBox.textContent = "Danke, deine Angaben wurden übermittelt.";
+    form.reset();
+  } catch (err) {
+    statusBox.className = "status err";
+    statusBox.textContent = "Übermittlung fehlgeschlagen. Bitte die Apps-Script-URL im HTML prüfen oder die Person informieren, die den Fragebogen bereitgestellt hat.";
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Fragebogen absenden";
+  }
+});
+</script>
+
+</body>
+</html>
